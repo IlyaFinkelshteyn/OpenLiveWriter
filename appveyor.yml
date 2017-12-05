@@ -21,6 +21,7 @@ install:
   - rmdir C:\Tools\vcpkg /q /s
   - git clone --depth=1 --branch=appveyor-issue-2299 https://github.com/Microsoft/vcpkg C:\Tools\vcpkg
   - cd C:\Tools\vcpkg
+  - dir /s
   - bootstrap.bat
   - vcpkg integrate install
   - ps: Add-Path 'C:\Tools\vcpkg'
