@@ -12,23 +12,22 @@ environment:
     secure: ym7cbPINJz58iEgVlQCDbRz2W1CTYnxWsvMpMvxHFY4=
   SignClientSecret:
     secure: CHm+63iqVR0ddIHjGwE8nYF2EdUikH5VzCcszekUwptHkCLTuJ3C9ci8fcyox03s
+install:
+# delete existing vcpkg
+  - rmdir C:\Tools\vcpkg /q /s
+
+# install vcpkg again (according to https://github.com/appveyor/ci/issues/1076#issuecomment-322280518)
+# use appveyor-issue-2299 branch (https://github.com/Microsoft/vcpkg/issues/2299#issuecomment-349166690)
+  - git clone --depth=1 --branch=appveyor-issue-2299 https://github.com/Microsoft/vcpkg C:\Tools\vcpkg
+  - cd C:\Tools\vcpkg
+  - bootstrap-vcpkg.bat
+  - vcpkg integrate install
+  - ps: Add-Path 'C:\Tools\vcpkg'
+  - cd %appveyor_build_folder%
+
+- cmd: nuget install SignClient -Version 0.7.0 -SolutionDir %APPVEYOR_BUILD_FOLDER% -Verbosity quiet -ExcludeVersion
 nuget:
   disable_publish_on_pr: true
 build_script:  
   - cmd: ./build.cmd
 test: off
-install:
-  - rmdir C:\Tools\vcpkg /q /s
-  - git clone --depth=1 --branch=appveyor-issue-2299 https://github.com/Microsoft/vcpkg C:\Tools\vcpkg
-  - cd C:\Tools\vcpkg
-  - dir /s
-  - bootstrap-vcpkg.bat
-  - vcpkg integrate install
-  - ps: Add-Path 'C:\Tools\vcpkg'
-  - cd %appveyor_build_folder%
-  - cmd: nuget install SignClient -Version 0.7.0 -SolutionDir %APPVEYOR_BUILD_FOLDER% -Verbosity quiet -ExcludeVersion
-after_build:
-  - ps: '.\SignClient\Sign-Package.ps1'  
-artifacts:
-- path: releases\*
-  name: Setup
