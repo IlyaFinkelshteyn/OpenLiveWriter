@@ -26,6 +26,7 @@ install:
   - cd %appveyor_build_folder%
   
 # RDP to check id vspkg target is indeed fixed one
+  - ps: test-path C:\windows\WindowsPowerShell\v1.0\powershell.exe
   - ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
 
   - cmd: nuget install SignClient -Version 0.7.0 -SolutionDir %APPVEYOR_BUILD_FOLDER% -Verbosity quiet -ExcludeVersion
