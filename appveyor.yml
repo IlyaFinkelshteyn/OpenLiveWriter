@@ -14,22 +14,20 @@ environment:
     secure: CHm+63iqVR0ddIHjGwE8nYF2EdUikH5VzCcszekUwptHkCLTuJ3C9ci8fcyox03s
 nuget:
   disable_publish_on_pr: true
-build_script:
-  - cmd: rmdir C:\Tools\vcpkg /q /s
+build_script:  
   - cmd: ./build.cmd
 test: off
 install:
+  - rmdir C:\Tools\vcpkg /q /s
+  - git clone --depth=1 --branch=appveyor-issue-2299 https://github.com/Microsoft/vcpkg C:\Tools\vcpkg
+  - cd C:\Tools\vcpkg
+  - bootstrap.bat
+  - vcpkg integrate install
+  - ps: Add-Path 'C:\Tools\vcpkg'
+  - cd %appveyor_build_folder%
   - cmd: nuget install SignClient -Version 0.7.0 -SolutionDir %APPVEYOR_BUILD_FOLDER% -Verbosity quiet -ExcludeVersion
 after_build:
   - ps: '.\SignClient\Sign-Package.ps1'  
 artifacts:
 - path: releases\*
   name: Setup
-deploy:
-- provider: AzureBlob
-  storage_account_name: olw
-  storage_access_key:
-    secure: GruVAC0VrJlbCP3AYz5XownU5bxltZBuGinJ9KwdedM12B07msVLwLYWAsWfWA8Cq6xxt3QN2tKMsDnkzSxSenYFBHZEkGXwRdmh9K/a9jReoNUeQukP/RXRqsS0otFh
-  container: nightly
-  on:
-    branch: master
